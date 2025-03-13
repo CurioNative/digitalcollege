@@ -1,0 +1,27 @@
+{% extends "college/base.html" %}
+{% block title %}View Assigned Faculties - Digital College{% endblock %}
+{% block content %}
+  <h2>Faculties Assigned to Classes</h2>
+  {% if subjects %}
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Faculty</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for subject in subjects %}
+          <tr>
+            <td>{{ subject.name }}</td>
+            <td>{{ subject.faculty.username }}</td>
+            <td>{{ subject.faculty.email }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No faculties have been assigned to classes yet.</p>
+  {% endif %}
+{% endblock %}

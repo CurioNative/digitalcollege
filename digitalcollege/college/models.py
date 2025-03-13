@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
+from datetime import timedelta
+import random
 
 class Department(models.Model):
     """
@@ -24,7 +26,7 @@ class CustomUser(AbstractUser):
         ('hod', 'Head of Department'),
         ('student', 'Student'),
     )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, blank=True)
     department = models.ForeignKey(
         Department, on_delete=models.SET_NULL, null=True, blank=True,
         help_text="Department to which the user belongs. (Required for students)"
@@ -93,26 +95,55 @@ class Material(models.Model):
 
 class Question(models.Model):
     """
-    Represents a question that pops up during a video lecture.
-    The time_stamp indicates when (relative to the start of the video) the question should appear.
+    Represents a multiple choice question (MCQ) that pops up during a video lecture.
+    Instead of a fixed popup time, the question appears within a specified time range.
     """
-    video = models.ForeignKey(VideoLecture, on_delete=models.CASCADE, related_name='questions')
-    question_text = models.TextField()
-    time_stamp = models.DurationField(help_text="Time (HH:MM:SS) when the question pops up")
+    video = models.ForeignKey('VideoLecture', on_delete=models.CASCADE, related_name='questions')
+    question_text = models.TextField(help_text="The MCQ question text")
+    popup_start_time = models.DurationField(help_text="Start time (HH:MM:SS) when the question can pop up", default=timedelta(seconds=0))
+    popup_end_time = models.DurationField(help_text="End time (HH:MM:SS) until which the question can pop up", default=timedelta(seconds=60))
 
     def __str__(self):
-        return f"Question for {self.video.title}"
+        return f"MCQ for {self.video.title}"
+
+    def get_randomized_choices(self):
+        """
+        Returns the associated choices in a randomized order.
+        """
+        choices = list(self.choices.all())
+        random.shuffle(choices)
+        return choices
+
+class Choice(models.Model):
+    """
+    Represents an option for an MCQ question.
+    """
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices')
+    choice_text = models.CharField(max_length=255, help_text="Text of the choice option")
+    is_correct = models.BooleanField(default=False, help_text="Indicates if this is the correct answer")
+
+    def __str__(self):
+        return f"{self.choice_text} ({'Correct' if self.is_correct else 'Incorrect'})"
 
 class Answer(models.Model):
     """
-    Stores a student's answer to a question during a video lecture.
+    Records a student's selected choice for an MCQ question.
     """
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
     student = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'student'},
+        CustomUser,
+        on_delete=models.CASCADE,
+        limit_choices_to={'role': 'student'},
         help_text="Student who answered the question"
     )
     answer_text = models.TextField()
+    selected_choice = models.ForeignKey(
+        Choice,
+        on_delete=models.CASCADE,
+        null=True,  # Allowing null temporarily to fix migration issues
+        blank=True,
+        help_text="The selected choice by the student"
+    )
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

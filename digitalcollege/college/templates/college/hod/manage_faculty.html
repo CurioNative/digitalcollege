@@ -18,7 +18,7 @@
         {% endfor %}
       </select>
     </div>
-    <div>
+    <div class="form-group">
       <label for="faculty">Faculty:</label>
       <select name="faculty" id="faculty" required>
         {% for faculty in faculty_list %}
@@ -27,8 +27,32 @@
       </select>
     </div>
     <div>
-      <button type="submit">Assign Faculty</button>
+      <button type="submit" class="btn">Assign Faculty</button>
     </div>
   </form>
+
+  <h3>Current Assignments</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Assigned Faculty</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for subject in subjects %}
+        {% if subject.faculty %}
+          <tr>
+            <td>{{ subject.name }}</td>
+            <td>{{ subject.faculty.username }}</td>
+            <td>
+              <a href="{% url 'remove_faculty_assignment' subject.id %}" class="btn" style="background: #e53935;">Remove</a>
+            </td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

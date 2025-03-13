@@ -1,0 +1,11 @@
+{% extends "college/base.html" %}
+{% block title %}Delete Video Lecture - Digital College{% endblock %}
+{% block content %}
+  <h2>Delete Video Lecture</h2>
+  <p>Are you sure you want to delete the video lecture titled "<strong>{{ video.title }}</strong>"?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn" style="background: #e53935;">Yes, Delete</button>
+    <a href="{% url 'faculty_video_list' %}" class="btn">Cancel</a>
+  </form>
+{% endblock %}

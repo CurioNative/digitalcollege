@@ -1,0 +1,11 @@
+{% extends "college/base.html" %}
+{% block title %}Remove Faculty Assignment - Digital College{% endblock %}
+{% block content %}
+  <h2>Remove Faculty Assignment</h2>
+  <p>Are you sure you want to remove the assigned faculty <strong>{{ subject.faculty.username }}</strong> from the subject "<strong>{{ subject.name }}</strong>"?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn" style="background: #e53935;">Yes, Remove</button>
+    <a href="{% url 'manage_faculty' %}" class="btn">Cancel</a>
+  </form>
+{% endblock %}

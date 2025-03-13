@@ -1,0 +1,38 @@
+{% extends "college/base.html" %}
+{% block title %}My Materials - Digital College{% endblock %}
+{% block content %}
+  <h2>My Materials</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Resource URL / File</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for material in materials %}
+      <tr>
+        <td>{{ material.title }}</td>
+        <td>
+          {% if material.resource_url %}
+            <a href="{{ material.resource_url }}" target="_blank">View Resource</a>
+          {% elif material.resource_file %}
+            <a href="{{ material.resource_file.url }}" target="_blank">View Uploaded Resource</a>
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'edit_material' material.pk %}" class="btn">Edit</a>
+          <a href="{% url 'delete_material' material.pk %}" class="btn" style="background: #e53935;">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">No materials found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

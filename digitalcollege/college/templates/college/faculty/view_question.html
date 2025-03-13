@@ -1,0 +1,13 @@
+{% extends "college/base.html" %}
+{% block title %}View MCQ Question - Digital College{% endblock %}
+
+{% block content %}
+  <h2>Question Preview</h2>
+  <p><strong>Question:</strong> {{ question.question_text }}</p>
+  <h3>Choices:</h3>
+  <ul>
+    {% for choice in question.get_randomized_choices %}
+      <li>{{ choice.choice_text }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

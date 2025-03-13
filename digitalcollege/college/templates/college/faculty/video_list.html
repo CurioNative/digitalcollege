@@ -1,0 +1,38 @@
+{% extends "college/base.html" %}
+{% block title %}My Video Lectures - Digital College{% endblock %}
+{% block content %}
+  <h2>My Video Lectures</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Video URL / File</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for video in video_lectures %}
+      <tr>
+        <td>{{ video.title }}</td>
+        <td>
+          {% if video.video_url %}
+            <a href="{{ video.video_url }}" target="_blank">View Video</a>
+          {% elif video.video_file %}
+            <a href="{{ video.video_file.url }}" target="_blank">View Uploaded Video</a>
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'edit_video_lecture' video.pk %}" class="btn">Edit</a>
+          <a href="{% url 'delete_video_lecture' video.pk %}" class="btn" style="background: #e53935;">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">No video lectures found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
