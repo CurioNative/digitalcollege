@@ -1,0 +1,36 @@
+<!-- college/templates/college/dashboard.html -->
+{% extends "college/base.html" %}
+{% block title %}Dashboard - Digital College{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+  <h2>Welcome, {{ user.username }}!</h2>
+  <p>You are logged in as <strong>{{ user.get_role_display }}</strong>.</p>
+
+  {% if user.role == 'faculty' %}
+    <section>
+      <h3>Your Subjects</h3>
+      <!-- You can loop through subjects assigned to this faculty -->
+      {% for subject in subjects %}
+        <div class="subject-item">
+          <p>{{ subject.name }} - <a href="{% url 'upload_material' %}">Manage Material</a></p>
+        </div>
+      {% empty %}
+        <p>No subjects assigned yet.</p>
+      {% endfor %}
+    </section>
+  {% elif user.role == 'class_advisor' %}
+    <section>
+      <h3>Your Class Management</h3>
+      <p><a href="{% url 'create_student' %}">Create Student Account</a></p>
+      <p><a href="{% url 'manage_schedule' %}">Manage Class Schedule</a></p>
+    </section>
+  {% elif user.role == 'hod' %}
+    <section>
+      <h3>Department Management</h3>
+      <p><a href="{% url 'manage_faculty' %}">Assign Faculty to Subjects</a></p>
+      <p><a href="{% url 'view_class_advisors' %}">View Class Advisors</a></p>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

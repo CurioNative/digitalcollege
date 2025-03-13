@@ -1,0 +1,27 @@
+<!-- college/templates/college/faculty/upload_material.html -->
+{% extends "college/base.html" %}
+{% block title %}Upload Material - Digital College{% endblock %}
+
+{% block content %}
+<div class="upload-material">
+  <h2>Upload Lecture Material</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+      <label for="subject">Subject:</label>
+      <select name="subject" id="subject" required>
+        {% for subject in subjects %}
+          <option value="{{ subject.id }}">{{ subject.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="material_file">Select File:</label>
+      <input type="file" name="material_file" id="material_file" required>
+    </div>
+    <div>
+      <button type="submit">Upload</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

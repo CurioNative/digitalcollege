@@ -1,0 +1,30 @@
+<!-- college/templates/college/class_advisor/create_student.html -->
+{% extends "college/base.html" %}
+{% block title %}Create Student Account - Digital College{% endblock %}
+
+{% block content %}
+<div class="create-student">
+  <h2>Create Student Account</h2>
+  {% if message %}
+    <p style="color:green;">{{ message }}</p>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div>
+      <label for="username">Student Username:</label>
+      <input type="text" name="username" id="username" required>
+    </div>
+    <div>
+      <label for="password">Temporary Password:</label>
+      <input type="password" name="password" id="password" required>
+    </div>
+    <div>
+      <label for="semester">Semester (1-8):</label>
+      <input type="number" name="semester" id="semester" min="1" max="8" required>
+    </div>
+    <div>
+      <button type="submit">Create Account</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+<!-- college/templates/college/hod/view_class_advisors.html -->
+{% extends "college/base.html" %}
+{% block title %}View Class Advisors - Digital College{% endblock %}
+
+{% block content %}
+  <h2>Class Advisors List</h2>
+  {% if advisors %}
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Department</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for advisor in advisors %}
+          <tr>
+            <td>{{ advisor.username }}</td>
+            <td>{{ advisor.email }}</td>
+            <td>{{ advisor.department.name }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No class advisors found.</p>
+  {% endif %}
+{% endblock %}
