@@ -33,19 +33,20 @@ jobs:
     - name: Run Migrations
       run: |
         source .venv/bin/activate
+        cd digitalcollege  # Fix: Change to project directory if needed
         python manage.py makemigrations
         python manage.py migrate
 
     - name: Run Tests
       run: |
         source .venv/bin/activate
+        cd digitalcollege  # Fix: Change to project directory if needed
         python manage.py test
 
     - name: Collect Static Files
-      env:
-        DJANGO_SETTINGS_MODULE: digitalcollege.settings
       run: |
         source .venv/bin/activate
+        cd digitalcollege  # Fix: Change to project directory if needed
         python manage.py collectstatic --noinput
 
     - name: Deploy to Production (Optional)
