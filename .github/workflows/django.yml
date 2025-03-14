@@ -1,0 +1,55 @@
+name: Django CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Dependencies
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Migrations
+      run: |
+        source .venv/bin/activate
+        python manage.py makemigrations
+        python manage.py migrate
+
+    - name: Run Tests
+      run: |
+        source .venv/bin/activate
+        python manage.py test
+
+    - name: Collect Static Files
+      env:
+        DJANGO_SETTINGS_MODULE: digitalcollege.settings
+      run: |
+        source .venv/bin/activate
+        python manage.py collectstatic --noinput
+
+    - name: Deploy to Production (Optional)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "Deploying to production..."
+        # Add deployment commands (e.g., SSH, FTP, Docker, etc.)
