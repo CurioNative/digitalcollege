@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles',  # Ensure this is included
     'college',
 ]
 
@@ -127,11 +127,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Additional directories to search for static files
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'materials'),
-    os.path.join(BASE_DIR, 'static', 'materials'),  # Adding 'materials' folder
-]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] 
 
 
 # Default primary key field type
