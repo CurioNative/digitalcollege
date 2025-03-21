@@ -106,12 +106,13 @@
           {% if user.is_authenticated %}
             {% if user.role == 'faculty' %}
               <li><a href="{% url 'upload_material' %}">Upload Material</a></li>
-              <li><a href="{% url 'add_question' %}">Add Question</a></li>
               <li><a href="{% url 'faculty_video_list' %}">My Video Lectures</a></li>
               <li><a href="{% url 'faculty_material_list' %}">My Materials</a></li>
+              <li><a href="{% url 'faculty_attendance' %}">Attendance</a></li>
             {% elif user.role == 'class_advisor' %}
               <li><a href="{% url 'create_student' %}">Create Student</a></li>
               <li><a href="{% url 'manage_schedule' %}">Manage Schedule</a></li>
+              <li><a href="{% url 'view_attendance' %}">Attendance</a></li>
             {% elif user.role == 'hod' %}
               <li><a href="{% url 'manage_faculty' %}">Manage Faculty</a></li>
               <li><a href="{% url 'view_class_advisors' %}">View Class Advisors</a></li>

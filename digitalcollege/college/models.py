@@ -148,3 +148,22 @@ class Answer(models.Model):
 
     def __str__(self):
         return f"Answer by {self.student.username} for {self.question}"
+
+# Attendentance Model
+class Attendance(models.Model):
+    """
+    Records attendance for a student after watching a video lecture.
+    When a student completes watching a video, the frontend sends the attendance,
+    and this model stores which student viewed which video.
+    """
+    student = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        limit_choices_to={'role': 'student'},
+        help_text="Student who viewed the video"
+    )
+    video = models.ForeignKey(VideoLecture, on_delete=models.CASCADE, help_text="Video lecture that was viewed")
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Attendance: {self.student.username} - {self.video.title}"

@@ -1,0 +1,30 @@
+{% extends "college/base.html" %}
+{% block title %}Attendance Records - Digital College{% endblock %}
+
+{% block content %}
+  <h2>Attendance Records</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Video Lecture</th>
+        <th>Subject</th>
+        <th>Date & Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in attendance_records %}
+        <tr>
+          <td>{{ record.student.username }}</td>
+          <td>{{ record.video.title }}</td>
+          <td>{{ record.video.subject.name }}</td>
+          <td>{{ record.timestamp }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4">No attendance records found.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

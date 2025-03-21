@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import CustomUser, Subject, Question, Choice, VideoLecture, Material
+from .models import CustomUser, Subject, Question, Choice, VideoLecture, Material, Attendance
 from datetime import timedelta
 from .forms import VideoLectureForm, MaterialForm
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 def user_login(request):
     # If the user is already logged in, redirect to dashboard.
@@ -119,36 +121,6 @@ def view_class_advisors(request):
     return render(request, 'college/hod/view_class_advisors.html', {'advisors': advisors})
 
 @login_required
-def add_question(request):
-    if request.method == 'POST':
-        question_text = request.POST.get('question_text')
-        popup_start_time = request.POST.get('popup_start_time')
-        popup_end_time = request.POST.get('popup_end_time')
-        # video_lecture_id = request.POST.get('video_lecture')  # Assuming you have a way to select the video lecture
-
-        # Create the question
-        video_lecture = VideoLecture.objects.get(id=video_lecture_id)
-        question = Question.objects.create(
-            video=video_lecture,
-            question_text=question_text,
-            popup_start_time=timedelta(seconds=int(popup_start_time)),
-            popup_end_time=timedelta(seconds=int(popup_end_time))
-        )
-
-        # Handle choices (assuming you have a way to get them from the form)
-        for i in range(1, 5):  # Assuming 4 choices
-            choice_text = request.POST.get(f'choice_{i}')
-            is_correct = request.POST.get(f'correct_choice') == str(i)  # Check which choice is correct
-            Choice.objects.create(question=question, choice_text=choice_text, is_correct=is_correct)
-
-        return redirect('dashboard')  # Redirect to the dashboard or another page
-
-    # If GET request, render the form
-    return render(request, 'college/faculty/add_question.html', {
-        'video_lectures': VideoLecture.objects.all()  # Pass video lectures to the template
-    })
-
-@login_required
 def faculty_video_list(request):
     """
     List all video lectures for subjects taught by the logged-in faculty.
@@ -230,3 +202,50 @@ def view_assigned_faculties(request):
     # Get subjects within the HOD's department that have an assigned faculty member.
     subjects = Subject.objects.filter(department=request.user.department, faculty__isnull=False)
     return render(request, 'college/hod/view_assigned_faculties.html', {'subjects': subjects})
+
+@login_required
+@csrf_exempt  # If you're calling via API; alternatively, ensure proper CSRF tokens are sent
+def record_attendance(request):
+    """
+    Records attendance for a video lecture.
+    Expects a POST with JSON data containing 'video_id'.
+    """
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            video_id = data.get('video_id')
+            video = get_object_or_404(VideoLecture, id=video_id)
+            # Create attendance record for the logged-in student.
+            Attendance.objects.create(
+                student=request.user,
+                video=video
+            )
+            return JsonResponse({'status': 'success', 'message': 'Attendance recorded'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+@login_required
+def view_attendance(request):
+    """
+    Allows a class advisor to view attendance records of students in their department.
+    """
+    if request.user.role != 'class_advisor':
+        return HttpResponseForbidden("Not allowed")
+    
+    # Assuming class advisor is assigned a department, filter attendance by that department.
+    attendance_records = Attendance.objects.filter(student__department=request.user.department)
+    return render(request, 'college/class_advisor/attendance.html', {'attendance_records': attendance_records})
+
+@login_required
+def faculty_view_attendance(request):
+    """
+    Allows a faculty member to view attendance records for the videos of the subjects they teach.
+    """
+    if request.user.role != 'faculty':
+        return HttpResponseForbidden("You are not allowed to access this page.")
+    
+    # Filter attendance records by the faculty assigned to the video's subject.
+    attendance_records = Attendance.objects.filter(video__subject__faculty=request.user)
+    return render(request, 'college/faculty/attendance.html', {'attendance_records': attendance_records})
